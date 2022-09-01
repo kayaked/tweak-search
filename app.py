@@ -20,7 +20,6 @@ def longe():
         except requests.exceptions.ConnectionError:
             print("Error: {} had a serious connection issue.".format(source))
             continue
-        # Fuck you ryley angus, this is because of your rate limits
 
         print("Splitting package list...")
         try:
@@ -31,7 +30,6 @@ def longe():
             continue
 
         print("Parsing list...")
-        # This section is weird as fuck
 
         
 
@@ -45,7 +43,7 @@ def longe():
                     gl[x.split(": ")[0]] = ": ".join(x.split(": ")[1:]) # x.split(": ") will usually return a list with 2 items, as most lines are formatted like "Maintainer: Yak". 
                     # The above line basically makes gl into {'Package':'com.oganessiumspkgid.appballs','Name':'Appballs'} etc. The .join thing is incase the value has a colon in it
 
-                    # This part was mind fucking to do. It just formats lines with values like "Yak <yaksemail@yakz.cf>" into {'Name':'Yak','Email':'yaksemail@yakz.cf'}
+                    # Formats lines with values like "Yak <yaksemail@yakz.cf>" into {'Name':'Yak','Email':'yaksemail@yakz.cf'}
                     try:
                         if (x.split(": ")[0] == "Maintainer" or x.split(": ")[0] == "Sponsor" or x.split(": ")[0] == "Author"):
                             if len(x.split(" <")) > 1:
@@ -63,7 +61,7 @@ def longe():
                         pass
                     
             else:
-                # This part essentially packages gl into a list called nlst. nlst will later be incorporated into newlist.
+                # This part  packages gl into a list called nlst. nlst will later be incorporated into newlist.
                 gl['repo'] = source.split("//")[1].split("/")[0]
                 if source in sources:
                     gl['Icon'] = "http://cydia.saurik.com/icon@2x/{}.png".format(gl['Package'])
@@ -79,12 +77,10 @@ def longe():
 
 app = flask.Flask(__name__, template_folder='files')
 api = flask_restful.Api(app)
-# creates flask app (do i need to comment this part??)
 
 
-download_thread = threading.Thread(target=longe) # Longe is the function. Why longe? I don't fucking know
+download_thread = threading.Thread(target=longe)
 download_thread.start()
-# threads the repo updater in the background. it's called download_thread because i copy pasted it from stackoverflow
 
 class Tweak(Resource): # Main flask resource, q = search query
     def get(self, q):
@@ -102,10 +98,10 @@ class Tweak(Resource): # Main flask resource, q = search query
         in2 = {}
 
         for x in newlist:
-            if len(exact) + len(starts1) + len(starts2) + len(in1) + len(in2) >= 100: #Stops if results over 100 to save time/space
+            if len(exact) + len(starts1) + len(starts2) + len(in1) + len(in2) >= 100: # Stops if results over 100 to save time/space
                 break
             try:
-                # This right here is how the packages are organized. Not sure what results does. starts1 is if the search term starts with the tweak name, starts2 is if the tweak name starts with the search term, in1 is if the search term text is in the tweak name and in2 is if the tweak name is in the search text.
+                # This right here is how the packages are organized. starts1 is if the search term starts with the tweak name, starts2 is if the tweak name starts with the search term, in1 is if the search term text is in the tweak name and in2 is if the tweak name is in the search text.
                 # Each dictionary is formatted like {'com.oganessiumspkgid.brenskin':{'Name':'brenskin':'Version':'0.69'}}
                 if q.lower() in x['Name'].lower() or x['Name'].lower().startswith(q.lower()) or q.lower().startswith(x['Name'].lower()):
                     results[x['Package']] = x
